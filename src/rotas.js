@@ -1,8 +1,9 @@
 const express = require('express');
-const { listarContasBancarias } = require('./controladores/contasBancarias');
+const { listarContasBancarias, criarContaBancaria } = require('./controladores/contasBancarias');
 
 const rotas = express();
 
-rotas.get('/contas', listarContasBancarias)
+rotas.get('/contas', listarContasBancarias);
+rotas.post('/contas', criarContaBancaria)
 
 module.exports = { rotas }
