@@ -90,6 +90,54 @@ const listarSaques = async (req, resp) => {
     return resp.status(200).json(dadosDoBanco.saques)
 }
 
+const transferir = async (req, resp) => {
+    const { numero_conta_origem, numero_conta_destino, valor, senha } = req.body;
+
+    if (!numero_conta_origem) {
+        resp.status(400).json({ mensagem: 'O campo numero da conta de origem é obrigatório!' })
+    }
+
+    if (!numero_conta_destino) {
+        resp.status(400).json({ mensagem: 'O campo numero da conta de destino é obrigatório!' })
+    }
+
+    if (!valor) {
+        resp.status(400).json({ mensagem: 'O campo valor é obrigatório!' })
+    }
+
+    if (!senha) {
+        resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
+    }
+
+    const contaOrigemExistente = dadosDoBanco.contas.find((conta) => {
+        return conta.numeroConta === Number(numero_conta_origem)
+    })
+
+    if (!contaOrigemExistente) {
+        return resp.status(404).json({ mensagem: "Conta bancária de origem não encontrada!" })
+    }
+
+    const contaDestinoExistente = dadosDoBanco.contas.find((conta) => {
+        return conta.numeroConta === Number(numero_conta_destino)
+    })
+
+    if (!contaDestinoExistente) {
+        return resp.status(404).json({ mensagem: "Conta bancária de destino não encontrada!" })
+    }
+
+    if (isNaN(Number(senha)) || senha !== contaOrigemExistente.senha) {
+        return resp.status(400).json({ mensagem: "Senha inválida. Por favor, tente novamente!" })
+    }
+
+    if (valor > contaOrigemExistente.saldo) {
+        return resp.status(400).json({ mensagem: "Saldo insuficiente para saque!" })
+    }
+
+    //falta os dois ultimos topicos: subtrair e somar o valor da transferencia
+
+
+}
+
 module.exports = {
     depositar,
     listarDepositos,
