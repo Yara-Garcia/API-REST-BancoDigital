@@ -1,6 +1,5 @@
 const dadosDoBanco = require('../bancodedados');
-const { format } = require('date-fns');
-const { validarSenha } = require('../intermediarios');
+
 let numeroConta = 1;
 
 const listarContasBancarias = async (req, resp) => {
@@ -122,8 +121,35 @@ const atualizarUsuario = async (req, resp) => {
     }
 }
 
+const excluirConta = async (req, resp) => {
+
+    const numeroConta = Number(req.params.numeroConta);
+
+    if (isNaN(numeroConta)) {
+        return resp.status(400).json({ mensagem: 'O número da conta não é um número válido. Por favor, tente novamente!' });
+    }
+
+    const contaExistente = dadosDoBanco.contas.find((conta) => {
+        return conta.numeroConta === numeroConta
+    })
+
+    if (!contaExistente) {
+        return resp.status(404).json({ mensagem: "Esta conta bancária não foi encontrada." })
+    }
+
+    if (contaExistente.saldo !== 0) {
+        return resp.status(400).json({ mensagem: "A conta só pode ser removida se o saldo for zero!" })
+    }
+
+    const indice = dadosDoBanco.contas.indexOf(contaExistente)
+    dadosDoBanco.contas.splice(indice, 1);
+
+    return resp.status(204).send()
+}
+
 module.exports = {
     listarContasBancarias,
     criarContaBancaria,
-    atualizarUsuario
+    atualizarUsuario,
+    excluirConta
 }

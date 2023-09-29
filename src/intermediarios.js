@@ -1,6 +1,3 @@
-const dadosDoBanco = require('./bancodedados');
-const { listarContasBancarias } = require('./controladores/contasBancarias');
-
 const validarSenha = (req, resp, next) => {
     const { senha_banco } = req.query;
 
