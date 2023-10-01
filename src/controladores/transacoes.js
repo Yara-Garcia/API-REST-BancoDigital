@@ -83,7 +83,7 @@ const sacar = async (req, resp) => {
 
     dadosDoBanco.saques.push(novoSaque)
 
-    return resp.status(200).send()
+    return resp.status(201).send()
 }
 
 const listarSaques = async (req, resp) => {
@@ -130,17 +130,35 @@ const transferir = async (req, resp) => {
     }
 
     if (valor > contaOrigemExistente.saldo) {
-        return resp.status(400).json({ mensagem: "Saldo insuficiente para saque!" })
+        return resp.status(400).json({ mensagem: "Saldo insuficiente para operação!" })
     }
 
-    //falta os dois ultimos topicos: subtrair e somar o valor da transferencia
+    contaOrigemExistente.saldo -= valor
 
+    contaDestinoExistente.saldo += valor
 
+    const novaTransferencia = {
+        data: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        numero_conta_origem,
+        numero_conta_destino,
+        valor
+    }
+
+    dadosDoBanco.transferencias.push(novaTransferencia)
+
+    return resp.status(201).send()
+
+}
+
+const listarTransferencias = async (req, resp) => {
+    return resp.status(200).json(dadosDoBanco.transferencias)
 }
 
 module.exports = {
     depositar,
     listarDepositos,
     sacar,
-    listarSaques
+    listarSaques,
+    transferir,
+    listarTransferencias
 }
