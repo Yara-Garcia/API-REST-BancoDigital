@@ -154,11 +154,38 @@ const listarTransferencias = async (req, resp) => {
     return resp.status(200).json(dadosDoBanco.transferencias)
 }
 
+const consultarSaldo = async (req, resp) => {
+    const { numero_conta, senha } = req.query;
+
+    if (!numero_conta) {
+        resp.status(400).json({ mensagem: 'O campo numero da conta é obrigatório!' })
+    }
+
+    if (!senha) {
+        resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
+    }
+
+    const contaExistente = dadosDoBanco.contas.find((conta) => {
+        return conta.numeroConta === Number(numero_conta)
+    })
+
+    if (!contaExistente) {
+        return resp.status(404).json({ mensagem: "Conta bancária não encontrada!" })
+    }
+
+    if (isNaN(Number(senha)) || senha !== contaExistente.senha) {
+        return resp.status(400).json({ mensagem: "Senha inválida. Por favor, tente novamente!" })
+    }
+
+    return resp.status(200).json(`saldo: ${contaExistente.saldo}`)
+}
+
 module.exports = {
     depositar,
     listarDepositos,
     sacar,
     listarSaques,
     transferir,
-    listarTransferencias
+    listarTransferencias,
+    consultarSaldo
 }
