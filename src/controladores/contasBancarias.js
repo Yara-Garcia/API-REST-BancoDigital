@@ -3,18 +3,18 @@ const dadosDoBanco = require('../bancodedados');
 let numeroConta = 1;
 
 const listarContasBancarias = async (req, resp) => {
-    resp.json(dadosDoBanco.contas)
+    return resp.status(200).json(dadosDoBanco.contas)
 }
 
-const verificarTodosOsCampos = async (req, resp) => {
+const verificarTodosOsCampos = async (req, resp, next) => {
     const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
 
     if (!nome) {
-        resp.status(400).json({ mensagem: 'O campo nome é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo nome é obrigatório!' })
     }
 
     if (!cpf) {
-        resp.status(400).json({ mensagem: 'O campo cpf é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo cpf é obrigatório!' })
     }
 
     if (!data_nascimento) {
@@ -33,22 +33,21 @@ const verificarTodosOsCampos = async (req, resp) => {
         return resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
     }
 
+    next()
 }
-
 
 const criarContaBancaria = async (req, resp) => {
 
     try {
-        await verificarTodosOsCampos(req, resp);
 
         const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
 
         const cpfCadastrado = dadosDoBanco.contas.some((conta) => {
-            return conta.cpf === cpf
+            return conta.usuario.cpf === cpf
         })
 
         const emailCadastrado = dadosDoBanco.contas.some((conta) => {
-            return conta.email === email
+            return conta.usuario.email === email
         })
 
         if (cpfCadastrado || emailCadastrado) {
@@ -57,13 +56,15 @@ const criarContaBancaria = async (req, resp) => {
 
         const novaConta = {
             numeroConta,
-            nome,
-            cpf,
-            data_nascimento,
-            telefone,
-            email,
-            senha,
-            saldo: 0
+            saldo: 0,
+            usuario: {
+                nome,
+                cpf,
+                data_nascimento,
+                telefone,
+                email,
+                senha
+            }
         }
 
         dadosDoBanco.contas.push(novaConta)
@@ -79,7 +80,6 @@ const criarContaBancaria = async (req, resp) => {
 const atualizarUsuario = async (req, resp) => {
 
     try {
-        await verificarTodosOsCampos(req, resp);
 
         const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
         const numeroConta = Number(req.params.numeroConta)
@@ -97,23 +97,23 @@ const atualizarUsuario = async (req, resp) => {
         }
 
         const cpfCadastrado = dadosDoBanco.contas.some((conta) => {
-            return conta.cpf === cpf
+            return conta.usuario.cpf === cpf
         })
 
         const emailCadastrado = dadosDoBanco.contas.some((conta) => {
-            return conta.email === email
+            return conta.usuario.email === email
         })
 
         if (cpfCadastrado || emailCadastrado) {
             return resp.status(400).json({ mensagem: 'Já existe uma conta com o cpf ou e-mail informado!' })
         }
 
-        contaExistente.nome = nome
-        contaExistente.cpf = cpf
-        contaExistente.data_nascimento = data_nascimento
-        contaExistente.telefone = telefone
-        contaExistente.email = email
-        contaExistente.senha = senha
+        contaExistente.usuario.nome = nome
+        contaExistente.usuario.cpf = cpf
+        contaExistente.usuario.data_nascimento = data_nascimento
+        contaExistente.usuario.telefone = telefone
+        contaExistente.usuario.email = email
+        contaExistente.usuario.senha = senha
 
         return resp.status(204).send()
     } catch (error) {
@@ -149,7 +149,8 @@ const excluirConta = async (req, resp) => {
 
 module.exports = {
     listarContasBancarias,
+    verificarTodosOsCampos,
     criarContaBancaria,
     atualizarUsuario,
-    excluirConta
+    excluirConta,
 }

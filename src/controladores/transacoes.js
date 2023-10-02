@@ -65,7 +65,7 @@ const sacar = async (req, resp) => {
         return resp.status(404).json({ mensagem: "Conta bancária não encontrada!" })
     }
 
-    if (isNaN(Number(senha)) || senha !== contaExistente.senha) {
+    if (isNaN(Number(senha)) || senha !== contaExistente.usuario.senha) {
         return resp.status(400).json({ mensagem: "Senha inválida. Por favor, tente novamente!" })
     }
 
@@ -125,7 +125,7 @@ const transferir = async (req, resp) => {
         return resp.status(404).json({ mensagem: "Conta bancária de destino não encontrada!" })
     }
 
-    if (isNaN(Number(senha)) || senha !== contaOrigemExistente.senha) {
+    if (isNaN(Number(senha)) || senha !== contaOrigemExistente.usuario.senha) {
         return resp.status(400).json({ mensagem: "Senha inválida. Por favor, tente novamente!" })
     }
 
@@ -173,7 +173,7 @@ const consultarSaldo = async (req, resp) => {
         return resp.status(404).json({ mensagem: "Conta bancária não encontrada!" })
     }
 
-    if (isNaN(Number(senha)) || senha !== contaExistente.senha) {
+    if (isNaN(Number(senha)) || senha !== contaExistente.usuario.senha) {
         return resp.status(400).json({ mensagem: "Senha inválida. Por favor, tente novamente!" })
     }
 
