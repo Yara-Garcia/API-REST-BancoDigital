@@ -1,6 +1,6 @@
 const express = require('express');
 const { listarContasBancarias, criarContaBancaria, atualizarUsuario, excluirConta, verificarTodosOsCampos } = require('./controladores/contasBancarias');
-const { depositar, listarDepositos, sacar, listarSaques, transferir, listarTransferencias, consultarSaldo } = require('./controladores/transacoes');
+const { depositar, listarDepositos, sacar, listarSaques, transferir, listarTransferencias, consultarSaldo, condicaoParaExibirSaldoExtrato, exibirExtrato } = require('./controladores/transacoes');
 
 
 const rotas = express();
@@ -16,7 +16,8 @@ rotas.post('/transacoes/sacar', sacar)
 rotas.get('/saques', listarSaques);
 rotas.post('/transacoes/transferir', transferir);
 rotas.get('/transferencias', listarTransferencias)
-rotas.get('/contas/saldo', consultarSaldo)
+rotas.get('/contas/saldo', condicaoParaExibirSaldoExtrato, consultarSaldo)
+rotas.get('/contas/extrato', condicaoParaExibirSaldoExtrato, exibirExtrato)
 
 module.exports = { rotas }
 

@@ -5,11 +5,11 @@ const depositar = async (req, resp) => {
     const { numero_conta, valor } = req.body;
 
     if (!numero_conta) {
-        resp.status(400).json({ mensagem: 'O campo numero da conta é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo numero da conta é obrigatório!' })
     }
 
     if (!valor) {
-        resp.status(400).json({ mensagem: 'O campo valor é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo valor é obrigatório!' })
     }
 
     const contaExistente = dadosDoBanco.contas.find((conta) => {
@@ -46,15 +46,15 @@ const sacar = async (req, resp) => {
     const { numero_conta, valor, senha } = req.body;
 
     if (!numero_conta) {
-        resp.status(400).json({ mensagem: 'O campo numero da conta é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo numero da conta é obrigatório!' })
     }
 
     if (!valor) {
-        resp.status(400).json({ mensagem: 'O campo valor é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo valor é obrigatório!' })
     }
 
     if (!senha) {
-        resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
     }
 
     const contaExistente = dadosDoBanco.contas.find((conta) => {
@@ -94,19 +94,19 @@ const transferir = async (req, resp) => {
     const { numero_conta_origem, numero_conta_destino, valor, senha } = req.body;
 
     if (!numero_conta_origem) {
-        resp.status(400).json({ mensagem: 'O campo numero da conta de origem é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo numero da conta de origem é obrigatório!' })
     }
 
     if (!numero_conta_destino) {
-        resp.status(400).json({ mensagem: 'O campo numero da conta de destino é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo numero da conta de destino é obrigatório!' })
     }
 
     if (!valor) {
-        resp.status(400).json({ mensagem: 'O campo valor é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo valor é obrigatório!' })
     }
 
     if (!senha) {
-        resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
     }
 
     const contaOrigemExistente = dadosDoBanco.contas.find((conta) => {
@@ -154,15 +154,15 @@ const listarTransferencias = async (req, resp) => {
     return resp.status(200).json(dadosDoBanco.transferencias)
 }
 
-const consultarSaldo = async (req, resp) => {
+const condicaoParaExibirSaldoExtrato = async (req, resp, next) => {
     const { numero_conta, senha } = req.query;
 
     if (!numero_conta) {
-        resp.status(400).json({ mensagem: 'O campo numero da conta é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo numero da conta é obrigatório!' })
     }
 
     if (!senha) {
-        resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
+        return resp.status(400).json({ mensagem: 'O campo senha é obrigatório!' })
     }
 
     const contaExistente = dadosDoBanco.contas.find((conta) => {
@@ -177,8 +177,44 @@ const consultarSaldo = async (req, resp) => {
         return resp.status(400).json({ mensagem: "Senha inválida. Por favor, tente novamente!" })
     }
 
-    return resp.status(200).json(`saldo: ${contaExistente.saldo}`)
+    req.contaExistente = contaExistente;
+    next()
 }
+
+const consultarSaldo = async (req, resp) => {
+    const saldo = req.contaExistente.saldo;
+    return resp.status(200).json(`saldo: ${(saldo)}`)
+}
+
+const exibirExtrato = async (req, resp) => {
+    const { numero_conta } = req.query;
+
+    const depositos = dadosDoBanco.depositos.filter((deposito) => {
+        return deposito.numero_conta === numero_conta
+    })
+
+    const saques = dadosDoBanco.saques.filter((saque) => {
+        return saque.numero_conta === numero_conta
+    })
+
+    const transferenciasEnviadas = dadosDoBanco.transferencias.filter((transferencia) => {
+        return transferencia.numero_conta_origem === numero_conta
+    })
+
+    const transferenciasRecebidas = dadosDoBanco.transferencias.filter((transferencia) => {
+        return transferencia.numero_conta_destino === numero_conta
+    })
+
+    const extratoCompleto = {
+        depositos,
+        saques,
+        transferenciasEnviadas,
+        transferenciasRecebidas
+    }
+
+    return resp.status(200).json(extratoCompleto)
+}
+
 
 module.exports = {
     depositar,
@@ -187,5 +223,7 @@ module.exports = {
     listarSaques,
     transferir,
     listarTransferencias,
-    consultarSaldo
+    condicaoParaExibirSaldoExtrato,
+    consultarSaldo,
+    exibirExtrato
 }
