@@ -28,7 +28,7 @@ Para começar a usar a API, siga as seguintes etapas:
 
 2. Clone o seu repositório em sua máquina
 
-3. Instale as dependência do projeto através do comando:
+3. Instale as dependências do projeto através do comando:
 
 ```bash
 npm i
