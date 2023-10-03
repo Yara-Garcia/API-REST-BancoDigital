@@ -2,7 +2,6 @@ const express = require('express');
 const { listarContasBancarias, criarContaBancaria, atualizarUsuario, excluirConta, verificarTodosOsCampos } = require('./controladores/contasBancarias');
 const { depositar, listarDepositos, sacar, listarSaques, transferir, listarTransferencias, consultarSaldo, condicaoParaExibirSaldoExtrato, exibirExtrato } = require('./controladores/transacoes');
 
-
 const rotas = express();
 
 rotas.get('/contas', listarContasBancarias);

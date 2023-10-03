@@ -24,7 +24,7 @@ const depositar = async (req, resp) => {
         return resp.status(400).json({ mensagem: "O valor do depósito deve ser maior que zero!" })
     }
 
-    contaExistente.saldo += valor
+    contaExistente.saldo += valor;
 
     const novoDeposito = {
         data: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
@@ -205,16 +205,26 @@ const exibirExtrato = async (req, resp) => {
         return transferencia.numero_conta_destino === numero_conta
     })
 
-    const extratoCompleto = {
-        depositos,
-        saques,
-        transferenciasEnviadas,
-        transferenciasRecebidas
+    const extratoCompleto = {}
+
+    if (depositos.length > 0) {
+        extratoCompleto.depositos = depositos;
+    }
+
+    if (saques.length > 0) {
+        extratoCompleto.saques = saques;
+    }
+
+    if (transferenciasEnviadas.length > 0) {
+        extratoCompleto.transferenciasEnviadas = transferenciasEnviadas;
+    }
+
+    if (transferenciasRecebidas.length > 0) {
+        extratoCompleto.transferenciasRecebidas = transferenciasRecebidas;
     }
 
     return resp.status(200).json(extratoCompleto)
 }
-
 
 module.exports = {
     depositar,
