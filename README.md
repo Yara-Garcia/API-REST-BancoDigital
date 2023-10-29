@@ -36,7 +36,7 @@ npm i
 4. Execute o projeto com o seguinte comando:
 
 ```bash
-npm index.js
+node index.js
 ```
 
 A API estará disponível em http://localhost:3000. Você pode acessar os endpoints da API (GET, POST, PUT e DELETE) para listar, criar, atualizar e deletar contas, realizar transações, consultar saldos e exibir extratos através do aplicativo Insomnia.
